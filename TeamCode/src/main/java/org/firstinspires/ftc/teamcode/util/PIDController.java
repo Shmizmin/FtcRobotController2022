@@ -3,7 +3,7 @@
     Thanks to https://stemrobotics.cs.pdx.edu/node/7268 providing sample code and explanation for use
 */
 
-package org.firstinspires.ftc.teamcode.helper;
+package org.firstinspires.ftc.teamcode.util;
 
 // PID controller courtesy of Peter Tischler, with modifications.
 

@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class MecanumBot
 {
     private static final int MOTOR_COUNT = 4;
-    private static final int FL = 0, FR = 1, BL = 2, BR = 3;
 
-    private DcMotor[] motors = new DcMotor[MOTOR_COUNT];
+    public static final int FL = 0, FR = 1, BL = 2, BR = 3;
+    public DcMotor[] motors = new DcMotor[MOTOR_COUNT];
 
     public void setMode(DcMotor.RunMode mode)
     {

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -102,6 +104,9 @@ public class Camera
             @Override
             public void onError(int error_code)
             {
+                telemetry.addLine("Cannot open camera for viewing");
+                telemetry.update();
+                //telemetry.add
                 // TODO: add error handling to this
             }
         });

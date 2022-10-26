@@ -26,7 +26,7 @@ public class MecanumDrive extends OpMode
     @Override
     public void loop()
     {
-        //transmit a packet containing robot pose to FTCD
+        //transmit a packet containing robot pose to FTCDashboard
         {
 
 

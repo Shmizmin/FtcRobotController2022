@@ -15,7 +15,7 @@ public class Turner
 
     public void onUpdate(Gamepad gp1, Gamepad gp2)
     {
-        if (gp2.dpad_left) servo.setPosition(0.0);
+             if (gp2.dpad_left)  servo.setPosition(0.0);
         else if (gp2.dpad_right) servo.setPosition(1.0);
     }
 }
