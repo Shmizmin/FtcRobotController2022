@@ -16,7 +16,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-public class Camera
+public class CameraOpenCV
 {
     private class ConeScanner extends OpenCvPipeline
     {
@@ -75,7 +75,7 @@ public class Camera
     private OpenCvWebcam webcam;
     private ConeScanner scanner;
 
-    public Camera(String name, HardwareMap map)
+    public CameraOpenCV(String name, HardwareMap map)
     {
         //find the webcam hardware device on the control hub and obtain a handle to it
         int cmv_id = map.appContext.getResources().getIdentifier("CameraMonitorViewId", "id", map.appContext.getPackageName());

@@ -56,26 +56,30 @@ public class MecanumBot
 
     public void onUpdate(Gamepad gp1, Gamepad gp2)
     {
-        final double magnitude = Math.hypot(gp1.left_stick_x, gp1.left_stick_y);
-        final double robotAngle = Math.atan2(gp1.left_stick_y, gp1.left_stick_x) - Math.PI / 4;
-        final double rightX = gp1.right_stick_x;
+        final double magnitude = Math.hypot(bias(gp1.left_stick_y), bias(-gp1.left_stick_x));
+        final double robotAngle = Math.atan2(bias(-gp1.left_stick_x), bias(gp1.left_stick_y)) - Math.PI / 4;
+        final double rightX = bias(-gp1.right_stick_x);
         final double ROOT2 = Math.sqrt(2.0);
 
+        //setPower(0.2);
+
         motors[FL].setPower((magnitude * Math.cos(robotAngle) + rightX) * ROOT2);
-        motors[FR].setPower((magnitude * Math.sin(robotAngle) - rightX) * ROOT2);
-        motors[BL].setPower((magnitude * Math.cos(robotAngle) - rightX) * ROOT2);
+        motors[FR].setPower(-(magnitude * Math.sin(robotAngle) - rightX) * ROOT2);
+        motors[BL].setPower(-(magnitude * Math.cos(robotAngle) - rightX) * ROOT2);
         motors[BR].setPower((magnitude * Math.sin(robotAngle) + rightX) * ROOT2);
     }
 
     public MecanumBot(HardwareMap map)
     {
-        motors[FL] = map.dcMotor.get("frontLeftDrive");
-        motors[FR] = map.dcMotor.get("frontRightDrive");
-        motors[BL] = map.dcMotor.get("backLeftDrive");
-        motors[BR] = map.dcMotor.get("backRightDrive");
+        motors[FL] = map.get(DcMotor.class, "frontLeftDrive");
+        motors[FR] = map.get(DcMotor.class, "frontRightDrive");
+        motors[BL] = map.get(DcMotor.class, "backLeftDrive");
+        motors[BR] = map.get(DcMotor.class, "backRightDrive");
 
-        motors[FR].setDirection(DcMotor.Direction.REVERSE);
-        motors[BR].setDirection(DcMotor.Direction.REVERSE);
+
+        //motors[FR].setDirection(DcMotor.Direction.REVERSE);
+        //motors[BR].setDirection(DcMotor.Direction.REVERSE);
+        //motors[BL].setDirection(DcMotor.Direction.REVERSE);
 
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

@@ -6,17 +6,18 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.MecanumBot;
+import org.firstinspires.ftc.teamcode.util.Robot;
 
 @TeleOp(name = "Mecanum Drive", group = "TeleOp")
 public class MecanumDrive extends OpMode
 {
-    private MecanumBot robot = null;
+    private Robot robot = null;
     private FtcDashboard dashboard = null;
 
     @Override
     public void init()
     {
-        robot = new MecanumBot(hardwareMap);
+        robot = new Robot(hardwareMap);
         dashboard = FtcDashboard.getInstance();
 
         telemetry.addLine("Robot Initialization Complete");

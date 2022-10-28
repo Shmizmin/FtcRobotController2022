@@ -10,13 +10,12 @@ public class Lifter
 
     public Lifter(HardwareMap map)
     {
-        motor = map.dcMotor.get("lifter");
+        motor = map.get(DcMotor.class, "lifter");
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void onUpdate(Gamepad gp1, Gamepad gp2)
     {
-             if (gp2.dpad_up)   motor.setPower(-0.8);
-        else if (gp2.dpad_down) motor.setPower(0.8);
-        else                    motor.setPower(0.0);
+        motor.setPower((gp2.right_trigger - gp2.left_trigger) * 0.5);
     }
 }

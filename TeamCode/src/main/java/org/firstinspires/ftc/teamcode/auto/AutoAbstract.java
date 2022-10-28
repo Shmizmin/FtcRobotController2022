@@ -14,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.util.Camera;
+import org.firstinspires.ftc.teamcode.util.CameraOpenCV;
 import org.firstinspires.ftc.teamcode.util.IMU;
 import org.firstinspires.ftc.teamcode.util.MecanumBot;
 import org.firstinspires.ftc.teamcode.util.PIDController;
@@ -28,7 +28,10 @@ abstract public class AutoAbstract extends LinearOpMode
 
     //will be used for the rev imu
     private Orientation last_angles = new Orientation();
-    private double global_angle = 0.0, rotation = 0.0, start_delay = 0.0;
+    private double global_angle = 0.0, rotation = 0.0;
+
+    private double start_delay = 0.0;
+    private boolean advanced = true;
 
     private IMU imu = null;
 
@@ -39,7 +42,7 @@ abstract public class AutoAbstract extends LinearOpMode
     private boolean can_input = true;
     private int selected_item = 0;
 
-    protected Camera camera = null;
+    protected CameraOpenCV camera = null;
     protected MecanumBot robot = null;
 
     /*
@@ -206,7 +209,7 @@ abstract public class AutoAbstract extends LinearOpMode
         // TODO: tune this values better
         pid_rotate = new PIDController(0.003, 0.000015, 0.00005);
 
-        camera = new Camera("Webcam", hardwareMap);
+        camera = new CameraOpenCV("Webcam", hardwareMap);
         imu = new IMU("imu", hardwareMap);
 
         //wait for the IMU to calibrate before proceeding
@@ -279,11 +282,10 @@ abstract public class AutoAbstract extends LinearOpMode
 
             sleep((long)start_delay * 1000);
 
-            telemetry.addLine("Autonomous Configuration:");
-            telemetry.addData((selectedItem == 0 ? ">" : " ") + "Start Delay", startDelay);
-            telemetry.addLine((selectedItem == 1 ? ">" : " ") + "Score Extra Duck A: " + (scoreExtraDuckA ? "true" : "false"));
-            telemetry.addLine((selectedItem == 2 ? ">" : " ") + "Score Extra Blocks B: " + (collectExtraBlocksB ? "true" : "false"));
-            telemetry.addLine("Can Input: " + (canInput ? "true" : "false"));
+            telemetry.addLine("Autonomous Configuration: ");
+            telemetry.addData((selected_item == 0 ? ">" : "") + "Start Delay: ", start_delay);
+            telemetry.addLine((selected_item == 1 ? ">" : " ") + "Advanced: " + (advanced ? "true" : "false"));
+            telemetry.addLine("Can Input: " + (can_input ? "true" : "false"));
             telemetry.update();
         }
 

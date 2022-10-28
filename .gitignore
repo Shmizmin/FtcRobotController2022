@@ -85,3 +85,5 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+java_pid1594.hprof
+java_pid892.hprof
