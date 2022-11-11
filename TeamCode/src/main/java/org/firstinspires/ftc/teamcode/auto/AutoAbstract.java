@@ -7,7 +7,6 @@ import static org.firstinspires.ftc.teamcode.util.MecanumBot.FR;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -37,7 +36,6 @@ abstract public class AutoAbstract extends LinearOpMode
 
     //used for making accurate turns, stored as a member variable in case several functions need access to it in the future
     private PIDController pid_rotate;
-    private String positional_data = null;
 
     private boolean can_input = true;
     private int selected_item = 0;
@@ -45,11 +43,7 @@ abstract public class AutoAbstract extends LinearOpMode
     protected CameraOpenCV camera = null;
     protected MecanumBot robot = null;
 
-    /*
-     * This method returns a value of the Z axis of the REV Expansion Hub IMU.
-     * It transforms the value from (-180, 180) to (-inf, inf).
-     * This code was taken and modified from
-     */
+
     //sourced from https://stemrobotics.cs.pdx.edu/node/7265
     //zeroes out the measured angle from the imu
     protected void resetAngle()
@@ -91,11 +85,8 @@ abstract public class AutoAbstract extends LinearOpMode
         return global_angle;
     }
 
-    /*
-     * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
-     * @param degrees Degrees to turn, + is left - is right
-     */
-    //from  https://stemrobotics.cs.pdx.edu/node/7265
+    //sourced from  https://stemrobotics.cs.pdx.edu/node/7265
+    //rotates the robot the specified number of degrees
     protected void rotate(int degree)
     {
         double degrees = -degree;
@@ -170,46 +161,45 @@ abstract public class AutoAbstract extends LinearOpMode
         resetAngle();
     }
 
-    public void forward(double inches, double timeout)
+    protected void forward(double inches, double timeout)
     {
         encoderDrive(inches, inches, inches, inches, timeout);
     }
 
-    public void backward(double inches, double timeout)
+    protected void backward(double inches, double timeout)
     {
         encoderDrive(-inches, -inches, -inches, -inches, timeout);
     }
 
-    public void left(double inches, double timeout)
+
+    private double correction(double input)
     {
         final double factor = 40.0 / 32.5;
-        final double distance = inches * factor;
+        return (input * factor);
+    }
 
+    protected void left(double inches, double timeout)
+    {
+        final double distance = correction(inches);
         encoderDrive(-distance, distance, distance, -distance, timeout);
     }
 
-    public void right(double inches, double timeout)
+    protected void right(double inches, double timeout)
     {
-        final double factor = 40.0 / 32.5;
-        final double distance = inches * factor;
-
+        final double distance = correction(inches);
         encoderDrive(distance, -distance, -distance, distance, timeout);
     }
 
 
     //creates and initializes all the robot hardware, including the motors and camera
-    public void onInit(String data)
+    protected void onInit()
     {
-        //initializes all of the hardware onboard the robot
         robot = new MecanumBot(hardwareMap);
 
-        robot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.motors[BL].setDirection(DcMotorSimple.Direction.REVERSE);
-
-        // TODO: tune this values better
+        // TODO: tune these values better
         pid_rotate = new PIDController(0.003, 0.000015, 0.00005);
 
-        camera = new CameraOpenCV("Webcam", hardwareMap);
+        camera = new CameraOpenCV("Webcam", hardwareMap, telemetry);
         imu = new IMU("imu", hardwareMap);
 
         //wait for the IMU to calibrate before proceeding
@@ -225,6 +215,8 @@ abstract public class AutoAbstract extends LinearOpMode
         //menuing system
         while (!isStarted())
         {
+            sleep(100);
+
             can_input = (timer.milliseconds() > 250);
 
             if (can_input && (gamepad1.dpad_up || gamepad2.dpad_up))
@@ -240,6 +232,7 @@ abstract public class AutoAbstract extends LinearOpMode
             }
 
             final int START_DELAY = 0, ADVANCED = 1;
+
             //clamp to possible range
             selected_item = Math.max(START_DELAY, Math.min(ADVANCED, selected_item));
 
@@ -247,14 +240,15 @@ abstract public class AutoAbstract extends LinearOpMode
             {
                 case START_DELAY:
                 {
-                    if (can_input && (gamepad1.dpad_left || gamepad2.dpad_left))
+                    if (can_input && (gamepad1.dpad_left || gamepad2.dpad_left) && start_delay > 0.0)
                     {
                         start_delay -= 1.0;
                         timer.reset();
                         can_input = false;
+
                     }
 
-                    else if (can_input && (gamepad1.dpad_right || gamepad2.dpad_right))
+                    else if (can_input && (gamepad1.dpad_right || gamepad2.dpad_right) && start_delay < 30.0)
                     {
                         start_delay += 1.0;
                         timer.reset();
@@ -269,6 +263,7 @@ abstract public class AutoAbstract extends LinearOpMode
                         advanced = false;
                         timer.reset();
                         can_input = false;
+
                     }
 
                     else if (can_input && (gamepad1.dpad_right || gamepad2.dpad_right))
@@ -280,33 +275,24 @@ abstract public class AutoAbstract extends LinearOpMode
                 } break;
             }
 
-            sleep((long)start_delay * 1000);
-
             telemetry.addLine("Autonomous Configuration: ");
             telemetry.addData((selected_item == 0 ? ">" : "") + "Start Delay: ", start_delay);
             telemetry.addLine((selected_item == 1 ? ">" : " ") + "Advanced: " + (advanced ? "true" : "false"));
-            telemetry.addLine("Can Input: " + (can_input ? "true" : "false"));
             telemetry.update();
         }
 
-        //if (isStopRequested()) return;
+        sleep((long)start_delay * 1000);
     }
 
-    /*
-        Encoder powered drive function. Obtains how far each wheel needs to travel
-        and sets up the motor to run until they all reach those positions.
-
-    */
-    public void encoderDrive(double fl_inches,
-                             double fr_inches,
-                             double bl_inches,
-                             double br_inches, double timeout)
+    protected void encoderDrive(double fl_inches,
+                                double fr_inches,
+                                double bl_inches,
+                                double br_inches, double timeout)
     {
         ElapsedTime drive_time = new ElapsedTime();
         drive_time.reset();
 
         double angle = get_angle();
-
 
         PIDController pid_drive = new PIDController(0.005, 0.0001, 0.0002);
 
@@ -318,7 +304,7 @@ abstract public class AutoAbstract extends LinearOpMode
         int fl_target = 0, fr_target = 0,
             bl_target = 0, br_target = 0;
 
-        double power = 0.4;
+        double power = 0.2;
 
         if (opModeIsActive())
         {

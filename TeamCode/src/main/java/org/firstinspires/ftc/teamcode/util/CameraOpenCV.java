@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -16,26 +17,28 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import java.util.Objects;
+
 public class CameraOpenCV
 {
+    public enum Position
+    {
+        RED,
+        GREEN,
+        BLUE,
+    }
+
     private class ConeScanner extends OpenCvPipeline
     {
         private Mat working = new Mat();
 
-        private String name, data;
+        Position position;
 
-        private double red = 0.0,
-                       green = 0.0,
-                       blue = 0.0;
+        private Telemetry t = null;
 
-        public ConeScanner(String auto)
+        public ConeScanner(Telemetry t)
         {
-            name = auto;
-        }
-
-        private double max(double x, double y, double z)
-        {
-            return Math.max(x, Math.max(y, z));
+            this.t = t;
         }
 
         @Override
@@ -46,27 +49,30 @@ public class CameraOpenCV
             if (working.empty())
                 return in;
 
-            int x = 60,  y = 20, //160, 120
-                w = 100, h = 100;
+            int x = 190,  y = 40, //160, 120
+                w = 30, h = 70;
 
             Mat sub = working.submat(y, y + h, x, x +w);
 
             Imgproc.rectangle(working,
                     new Rect(x, y, w, h),
-                    new Scalar(0, 255, 0));
+                        (position == Position.RED   ? new Scalar(255, 255, 0) :
+                        (position == Position.GREEN ? new Scalar(255, 0, 255) :
+                        (position == Position.BLUE  ? new Scalar(0, 255, 0)   : new Scalar(40, 40, 40)))));
 
-            double   red = Core.sumElems(sub).val[1],
+            double red   = Core.sumElems(sub).val[1],
                    green = Core.sumElems(sub).val[2],
-                    blue = Core.sumElems(sub).val[3];
+                   blue  = Core.sumElems(sub).val[3];
 
-            double yellow = (red + green) * 0.5;
-            double magenta = (red + blue) * 0.5;
+            double m = Math.max(red, Math.max(green, blue));
 
-            double m = max(yellow, magenta, green);
+            t.addData("Red", red);
+            t.addData("Green", green);
+            t.addData("Blue", blue);
 
-                 if (yellow  == m) data = "Yellow";
-            else if (magenta == m) data = "Magenta";
-            else if (green   == m) data = "Green";
+                 if (red   == m) position = Position.RED;
+            else if (green == m) position = Position.GREEN;
+            else if (blue  == m) position = Position.BLUE;
 
             return working;
         }
@@ -75,14 +81,15 @@ public class CameraOpenCV
     private OpenCvWebcam webcam;
     private ConeScanner scanner;
 
-    public CameraOpenCV(String name, HardwareMap map)
+    public CameraOpenCV(String name, HardwareMap map, Telemetry t)
     {
         //find the webcam hardware device on the control hub and obtain a handle to it
-        int cmv_id = map.appContext.getResources().getIdentifier("CameraMonitorViewId", "id", map.appContext.getPackageName());
+        int cmv_id = map.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", map.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(map.get(WebcamName.class, name), cmv_id);
 
+
         //set the calculation pipeline to the scanner class created
-        scanner = new ConeScanner("TEST");
+        scanner = new ConeScanner(t);
         webcam.setPipeline(scanner);
 
         // NOTE: timeout for obtaining permission is configurable
@@ -93,6 +100,7 @@ public class CameraOpenCV
             a lambda function that handles success and failure of the camera opening asynchronously. If the camera is successfully opened,
             the streaming starts, which begins to repeatedly process frames through the pipeline, which is where we detect ducks/elements.
         */
+
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
             @Override

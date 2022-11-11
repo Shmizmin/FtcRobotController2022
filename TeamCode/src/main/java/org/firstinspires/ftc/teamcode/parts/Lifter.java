@@ -16,6 +16,6 @@ public class Lifter
 
     public void onUpdate(Gamepad gp1, Gamepad gp2)
     {
-        motor.setPower((gp2.right_trigger - gp2.left_trigger) * 0.5);
+        motor.setPower((gp2.left_trigger - gp2.right_trigger) * 0.5);
     }
 }
