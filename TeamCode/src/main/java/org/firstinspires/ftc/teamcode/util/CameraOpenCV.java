@@ -28,11 +28,11 @@ public class CameraOpenCV
         BLUE,
     }
 
-    private class ConeScanner extends OpenCvPipeline
+    public class ConeScanner extends OpenCvPipeline
     {
         private Mat working = new Mat();
 
-        Position position;
+        public Position position;
 
         private Telemetry t = null;
 
@@ -49,37 +49,37 @@ public class CameraOpenCV
             if (working.empty())
                 return in;
 
-            int x = 190,  y = 40, //160, 120
-                w = 30, h = 70;
+            int x = 190, y = 40,
+                w = 30,  h = 70;
 
             Mat sub = working.submat(y, y + h, x, x +w);
 
             Imgproc.rectangle(working,
                     new Rect(x, y, w, h),
-                        (position == Position.RED   ? new Scalar(255, 255, 0) :
-                        (position == Position.GREEN ? new Scalar(255, 0, 255) :
-                        (position == Position.BLUE  ? new Scalar(0, 255, 0)   : new Scalar(40, 40, 40)))));
+                        (position == Position.RED   ? new Scalar(255, 0, 0) :
+                        (position == Position.GREEN ? new Scalar(0, 255, 0) :
+                        (position == Position.BLUE  ? new Scalar(0, 0, 255) : new Scalar(40, 40, 40)))));
 
-            double red   = Core.sumElems(sub).val[1],
-                   green = Core.sumElems(sub).val[2],
-                   blue  = Core.sumElems(sub).val[3];
+            double r = Core.sumElems(sub).val[0],
+                   g = Core.sumElems(sub).val[1],
+                   b = Core.sumElems(sub).val[2];
 
-            double m = Math.max(red, Math.max(green, blue));
+            double m = Math.max(r, Math.max(g, b));
 
-            t.addData("Red", red);
-            t.addData("Green", green);
-            t.addData("Blue", blue);
+            //t.addData("Red", r);
+            //t.addData("Green", g);
+            //t.addData("Blue", b);
 
-                 if (red   == m) position = Position.RED;
-            else if (green == m) position = Position.GREEN;
-            else if (blue  == m) position = Position.BLUE;
+                 if (r == m) position = Position.RED;
+            else if (g == m) position = Position.GREEN;
+            else if (b == m) position = Position.BLUE;
 
             return working;
         }
     }
 
     private OpenCvWebcam webcam;
-    private ConeScanner scanner;
+    public ConeScanner scanner;
 
     public CameraOpenCV(String name, HardwareMap map, Telemetry t)
     {

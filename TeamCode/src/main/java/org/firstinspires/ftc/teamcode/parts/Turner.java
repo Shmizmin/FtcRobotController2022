@@ -1,52 +1,28 @@
 package org.firstinspires.ftc.teamcode.parts;
 
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Turner
 {
-    public CRServo servo = null;
-    private int check = 1;
+    public Servo servo = null;
 
     public Turner(HardwareMap map)
     {
-        servo = map.get(CRServo.class, "turner");
+        servo = map.get(Servo.class, "turner");
     }
 
     public void onUpdate(Gamepad gp1, Gamepad gp2)
     {
-        //if (gp2.right_stick_x < -0.05 ||
-        //    gp2.right_stick_x > +0.05)
-        //{
-        //check++;
-
         if (gp2.dpad_left)
         {
-            servo.setPower(-0.25);
+            servo.setPosition(0.0);
         }
 
         else if (gp2.dpad_right)
         {
-            servo.setPower(0.25);
+            servo.setPosition(1.0);
         }
-
-        else
-        {
-            servo.setPower(0.0);
-        }
-
-        try
-        {
-            Thread.sleep(50);
-        }
-
-        catch (InterruptedException ignored)
-        {
-        }
-
-        //}
-
-        //servo.setPower(gp2.right_stick_x * 0.5);
     }
 }
