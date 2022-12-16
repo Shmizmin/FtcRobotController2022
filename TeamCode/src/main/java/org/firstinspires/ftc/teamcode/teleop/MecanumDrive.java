@@ -35,7 +35,8 @@ public class MecanumDrive extends OpMode
         //transmit a packet containing robot pose to FTCDashboard
         {
         }
-        
+
+        telemetry.addData("Lifter", robot.lifter.motor.getCurrentPosition());
         telemetry.addData("FL", robot.bot.motors[FL].getCurrentPosition());
         telemetry.addData("FR", robot.bot.motors[FR].getCurrentPosition());
         telemetry.addData("BL", robot.bot.motors[BL].getCurrentPosition());

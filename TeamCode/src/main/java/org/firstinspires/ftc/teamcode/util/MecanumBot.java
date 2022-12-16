@@ -50,7 +50,7 @@ public class MecanumBot
 
     private double bias(double val)
     {
-        final double factor = 3.0;
+        final double factor = 2.0;
         final double calculated = ((Math.exp(Math.abs(val) * factor) - 1.0) / (Math.exp(factor) - 1.0));
         //return Math.copysign(val, calculated);
         return (val > 0.0) ? calculated : -calculated;

@@ -13,6 +13,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.parts.Lifter;
+import org.firstinspires.ftc.teamcode.parts.Turner;
 import org.firstinspires.ftc.teamcode.util.CameraOpenCV;
 import org.firstinspires.ftc.teamcode.util.IMU;
 import org.firstinspires.ftc.teamcode.util.MecanumBot;
@@ -42,7 +44,16 @@ abstract public class AutoAbstract extends LinearOpMode
 
     protected CameraOpenCV camera = null;
     protected MecanumBot robot = null;
+    protected Lifter lifter = null;
+    protected Turner turner = null;
 
+    protected void setLifter(int counts)
+    {
+        lifter.motor.setTargetPosition(counts);
+        lifter.motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lifter.motor.setPower(0.6);
+        sleep(250);
+    }
 
     //sourced from https://stemrobotics.cs.pdx.edu/node/7265
     //zeroes out the measured angle from the imu
@@ -195,11 +206,13 @@ abstract public class AutoAbstract extends LinearOpMode
     protected void onInit()
     {
         robot = new MecanumBot(hardwareMap);
+        lifter = new Lifter(hardwareMap);
+        turner = new Turner(hardwareMap);
 
         // TODO: tune these values better
         pid_rotate = new PIDController(0.003, 0.000015, 0.00005);
 
-        camera = new CameraOpenCV("Webcam", hardwareMap, telemetry);
+        camera = new CameraOpenCV("Webcam", hardwareMap);
         imu = new IMU("imu", hardwareMap);
 
         //wait for the IMU to calibrate before proceeding

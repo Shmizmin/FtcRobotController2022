@@ -34,11 +34,8 @@ public class CameraOpenCV
 
         public Position position;
 
-        private Telemetry t = null;
-
-        public ConeScanner(Telemetry t)
+        public ConeScanner()
         {
-            this.t = t;
         }
 
         @Override
@@ -78,10 +75,10 @@ public class CameraOpenCV
         }
     }
 
-    private OpenCvWebcam webcam;
+    public OpenCvWebcam webcam;
     public ConeScanner scanner;
 
-    public CameraOpenCV(String name, HardwareMap map, Telemetry t)
+    public CameraOpenCV(String name, HardwareMap map)
     {
         //find the webcam hardware device on the control hub and obtain a handle to it
         int cmv_id = map.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", map.appContext.getPackageName());
@@ -89,7 +86,7 @@ public class CameraOpenCV
 
 
         //set the calculation pipeline to the scanner class created
-        scanner = new ConeScanner(t);
+        scanner = new ConeScanner();
         webcam.setPipeline(scanner);
 
         // NOTE: timeout for obtaining permission is configurable
@@ -100,6 +97,8 @@ public class CameraOpenCV
             a lambda function that handles success and failure of the camera opening asynchronously. If the camera is successfully opened,
             the streaming starts, which begins to repeatedly process frames through the pipeline, which is where we detect ducks/elements.
         */
+
+       // webcam.st
 
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
@@ -112,8 +111,8 @@ public class CameraOpenCV
             @Override
             public void onError(int error_code)
             {
-                telemetry.addLine("Cannot open camera for viewing");
-                telemetry.update();
+                //telemetry.addLine("Cannot open camera for viewing");
+                //telemetry.update();
                 //telemetry.add
                 // TODO: add error handling to this
             }
